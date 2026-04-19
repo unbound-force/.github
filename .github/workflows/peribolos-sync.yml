@@ -1,0 +1,45 @@
+name: Org Sync
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'org/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  sync:
+    name: Sync Org Configuration
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+
+      - name: Generate GitHub App token
+        id: app-token
+        uses: actions/create-github-app-token@d72941d797fd3113feb6b93fd0dec494b13a2547 # v1
+        with:
+          app-id: ${{ secrets.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+          owner: unbound-force
+
+      - uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5
+        with:
+          go-version: '1.25'
+
+      - name: Install Peribolos
+        run: go install github.com/uwu-tools/peribolos@latest
+
+      - name: Apply org configuration
+        run: |
+          peribolos \
+            --config-path org/config.yaml \
+            --github-token-path <(echo "$GITHUB_TOKEN") \
+            --required-admins=jflowers \
+            --min-admins=2 \
+            --maximum-removal-delta=0.25 \
+            --confirm
+        env:
+          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}

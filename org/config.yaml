@@ -1,0 +1,39 @@
+orgs:
+  unbound-force:
+    # Org settings
+    default_repository_permission: read
+    has_organization_projects: true
+    has_repository_projects: true
+    members_can_create_repositories: true
+
+    # Org members
+    admins:
+      - jflowers
+      - marcusburghardt
+    members:
+      - gvauter
+      - hbraswelrh
+      - jpower432
+      - tyraziel
+
+    # Teams
+    teams:
+      overlords:
+        description: ""
+        privacy: closed
+        members:
+          - gvauter
+          - hbraswelrh
+          - jpower432
+        maintainers:
+          - jflowers
+          - marcusburghardt
+        repos:
+          .github: write
+          containerfile: write
+          dewey: write
+          gaze: write
+          homebrew-tap: write
+          replicator: write
+          unbound-force: write
+          website: write
