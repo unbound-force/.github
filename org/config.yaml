@@ -10,6 +10,7 @@ orgs:
     admins:
       - jflowers
       - marcusburghardt
+      - trevor-vaughan
     members:
       - gvauter
       - hbraswelrh
@@ -28,6 +29,7 @@ orgs:
         maintainers:
           - jflowers
           - marcusburghardt
+          - trevor-vaughan
         repos:
           .github: write
           containerfile: write
