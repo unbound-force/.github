@@ -25,21 +25,25 @@ jobs:
           private-key: ${{ secrets.APP_PRIVATE_KEY }}
           owner: unbound-force
 
-      - uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5
-        with:
-          go-version: '1.25'
-
-      - name: Install Peribolos
-        run: go install github.com/uwu-tools/peribolos@latest
-
       - name: Apply org configuration
         run: |
-          peribolos \
-            --config-path org/config.yaml \
-            --github-token-path <(echo "$GITHUB_TOKEN") \
-            --required-admins=jflowers \
-            --min-admins=2 \
-            --maximum-removal-delta=0.25 \
-            --confirm
+          echo "$GITHUB_TOKEN" > /tmp/github-token
+          docker run --rm \
+            -v "${{ github.workspace }}/org/config.yaml:/config.yaml:ro" \
+            -v /tmp/github-token:/token:ro \
+            ghcr.io/uwu-tools/peribolos:latest@sha256:669ed622aed87acf68744330f5d664851a627de262806894a3fd95bbf9aac56a \
+              --config-path /config.yaml \
+              --github-token-path /token \
+              --fix-org \
+              --fix-org-members \
+              --fix-teams \
+              --fix-team-members \
+              --fix-team-repos \
+              --required-admins=jflowers \
+              --min-admins=2 \
+              --require-self=false \
+              --maximum-removal-delta=0.25 \
+              --confirm
+          rm -f /tmp/github-token
         env:
           GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
