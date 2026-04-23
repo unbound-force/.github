@@ -15,6 +15,7 @@ orgs:
       - gvauter
       - hbraswelrh
       - jpower432
+      - t_hat
       - tyraziel
 
     # Teams
@@ -26,6 +27,7 @@ orgs:
           - gvauter
           - hbraswelrh
           - jpower432
+          - t_hat
         maintainers:
           - jflowers
           - marcusburghardt
