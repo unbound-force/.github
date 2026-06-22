@@ -13,12 +13,20 @@ orgs:
       - marcusburghardt
       - sonupreetam
     members:
+      - alayne222          # enterprise-managed
       - beatrizmcouto
+      - bplaxco            # enterprise-managed
       - em-redhat
+      - fkolacek-rh        # enterprise-managed
       - gvauter
       - gxmiranda
       - hbraswelrh
+      - jiprocha           # enterprise-managed
+      - jpadmanrh          # enterprise-managed
       - jpower432
+      - ppsomiad           # enterprise-managed
+      - rmonk-redhat       # enterprise-managed
+      - sharman-rh         # enterprise-managed
       - trevor-vaughan
       - tyraziel
       - yvonnedevlinrh
