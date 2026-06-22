@@ -42,7 +42,7 @@ jobs:
               --required-admins=jflowers \
               --min-admins=2 \
               --require-self=false \
-              --maximum-removal-delta=0.25 \
+              --maximum-removal-delta=0.50 \
               --confirm
           rm -f /tmp/github-token
         env:
