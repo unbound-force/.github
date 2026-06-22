@@ -13,41 +13,18 @@ orgs:
       - marcusburghardt
       - sonupreetam
     members:
-      - alayne222          # enterprise-managed
       - beatrizmcouto
-      - bplaxco            # enterprise-managed
       - em-redhat
-      - fkolacek-rh        # enterprise-managed
       - gvauter
       - gxmiranda
       - hbraswelrh
-      - jiprocha           # enterprise-managed
-      - jpadmanrh          # enterprise-managed
       - jpower432
-      - ppsomiad           # enterprise-managed
-      - rmonk-redhat       # enterprise-managed
-      - sharman-rh         # enterprise-managed
       - trevor-vaughan
       - tyraziel
       - yvonnedevlinrh
 
     # Teams
     teams:
-      # Enterprise-managed team - do not modify, managed via GitHub Enterprise
-      ent:enterprise-security-managers:
-        description: Enterprise security manager team
-        privacy: closed
-        members:
-          - alayne222
-          - ppsomiad
-          - sharman-rh
-        maintainers:
-          - bplaxco
-          - fkolacek-rh
-          - jiprocha
-          - jpadmanrh
-          - rmonk-redhat
-
       overlords:
         description: ""
         privacy: closed
