@@ -33,6 +33,21 @@ orgs:
 
     # Teams
     teams:
+      # Enterprise-managed team - do not modify, managed via GitHub Enterprise
+      ent:enterprise-security-managers:
+        description: Enterprise security manager team
+        privacy: closed
+        members:
+          - alayne222
+          - ppsomiad
+          - sharman-rh
+        maintainers:
+          - bplaxco
+          - fkolacek-rh
+          - jiprocha
+          - jpadmanrh
+          - rmonk-redhat
+
       overlords:
         description: ""
         privacy: closed
