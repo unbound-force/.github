@@ -25,6 +25,11 @@ orgs:
 
     # Teams
     teams:
+      security-managers:
+        description: Enterprise security manager team
+        privacy: closed
+        members:
+          - bplaxco
       overlords:
         description: ""
         privacy: closed
