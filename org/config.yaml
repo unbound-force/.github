@@ -73,3 +73,4 @@ orgs:
           replicator: write
           unbound-force: write
           website: write
+          review-council: write
