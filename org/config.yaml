@@ -14,7 +14,6 @@ orgs:
       - sonupreetam
     members:
       - beatrizmcouto
-      - bplaxco
       - em-redhat
       - gvauter
       - gxmiranda
@@ -26,11 +25,6 @@ orgs:
 
     # Teams
     teams:
-      security-managers:
-        description: Enterprise security manager team
-        privacy: closed
-        members:
-          - bplaxco
       overlords:
         description: ""
         privacy: closed
