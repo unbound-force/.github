@@ -35,12 +35,12 @@ orgs:
           - gxmiranda
           - hbraswelrh
           - jpower432
+          - trevor-vaughan
           - yvonnedevlinrh
         maintainers:
           - jflowers
           - marcusburghardt
           - sonupreetam
-          - trevor-vaughan
         repos:
           .github: write
           containerfile: write
