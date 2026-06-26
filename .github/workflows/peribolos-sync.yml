@@ -91,7 +91,6 @@ jobs:
             --min-admins 2
             --required-admins=jflowers
             --require-self=false
-            --maximum-removal-delta=0.25
             --ignore-enterprise-teams
             --ignore-secret-teams
           )
