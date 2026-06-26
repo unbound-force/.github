@@ -38,6 +38,8 @@ jobs:
           ref: 2b5fea27a177c767160452ba75dba978a88d8d63 # pin to known-good commit
 
       - name: Build peribolos
+        env:
+          GOTOOLCHAIN: auto
         run: |
           cd cmd/peribolos
           go mod tidy

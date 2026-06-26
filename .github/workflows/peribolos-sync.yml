@@ -50,6 +50,8 @@ jobs:
 
       - name: Build peribolos
         if: github.event_name != 'pull_request'
+        env:
+          GOTOOLCHAIN: auto
         run: |
           cd cmd/peribolos
           go mod tidy
