@@ -12,16 +12,17 @@ orgs:
       - jflowers
       - marcusburghardt
       - sonupreetam
+      - yvonnedevlinrh
     members:
       - beatrizmcouto
       - em-redhat
-      - gvauter
       - gxmiranda
       - hbraswelrh
       - jpower432
       - trevor-vaughan
       - tyraziel
-      - yvonnedevlinrh
+      - sedonnel
+      - cdaniels255
 
     # Teams
     teams:
@@ -31,12 +32,13 @@ orgs:
         members:
           - beatrizmcouto
           - em-redhat
-          - gvauter
           - gxmiranda
           - hbraswelrh
           - jpower432
           - trevor-vaughan
           - yvonnedevlinrh
+          - sedonnel
+          - cdaniels255
         maintainers:
           - jflowers
           - marcusburghardt
