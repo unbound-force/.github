@@ -52,3 +52,4 @@ orgs:
           replicator: write
           unbound-force: write
           website: write
+          intake-kit: write
