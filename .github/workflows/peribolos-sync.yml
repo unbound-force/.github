@@ -1,12 +1,14 @@
-name: Org Sync
+# Workflow to apply the Peribolos org configuration.
+# Runs on push to main, daily schedule, or manual dispatch.
+name: "Peribolos: Apply"
 
 on:
   push:
-    branches: [main]
-    paths:
-      - 'org/**'
+    branches:
+      - main
+  pull_request:
   schedule:
-    # Daily at 05:30 UTC
+    # Daily at 05:30 UTC — results visible by EU morning (07:30 CEST / 06:30 CET)
     - cron: '30 5 * * *'
   workflow_dispatch:
     inputs:
@@ -17,39 +19,40 @@ on:
         default: false
 
 concurrency:
-  group: peribolos-sync
+  group: peribolos-apply
   cancel-in-progress: false
 
-permissions:
-  contents: read
-
 jobs:
-  sync:
-    if: github.repository == 'unbound-force/.github'
-    name: Sync Org Configuration
+  Apply-peribolos:
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    permissions:
+      contents: read
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - name: Checkout unbound-force/.github repo
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Install Go
-        uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c # v6.4.0
+        uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
         with:
           go-version-file: './go.mod'
 
-      - name: Copy config
-        run: cp org/config.yaml /tmp
+      - name: Copy org/config.yaml
+        run: cp org/config.yaml /tmp/config.yaml
 
-      - name: Checkout peribolos source
-        if: github.event_name != 'pull_request'
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - name: Checkout peribolos code
+        if: >-
+          github.repository_owner == 'unbound-force' &&
+          github.event_name != 'pull_request'
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           repository: kubernetes-sigs/prow
           ref: 2b5fea27a177c767160452ba75dba978a88d8d63 # pin to known-good commit
 
       - name: Build peribolos
-        if: github.event_name != 'pull_request'
+        if: >-
+          github.repository_owner == 'unbound-force' &&
+          github.event_name != 'pull_request'
         env:
           GOTOOLCHAIN: auto
         run: |
@@ -59,23 +62,30 @@ jobs:
           cp peribolos /tmp
 
       - name: Generate GitHub App token
-        if: github.event_name != 'pull_request'
+        if: >-
+          github.repository_owner == 'unbound-force' &&
+          github.event_name != 'pull_request'
         id: app-token
         uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
         with:
           app-id: ${{ secrets.APP_ID }}
           private-key: ${{ secrets.APP_PRIVATE_KEY }}
           owner: unbound-force
-          expires-in: 600
 
       - name: Apply org configuration
-        if: github.event_name != 'pull_request'
+        if: >-
+          github.repository_owner == 'unbound-force' &&
+          github.event_name != 'pull_request'
         env:
           APP_TOKEN: ${{ steps.app-token.outputs.token }}
           DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.dry-run }}
         run: |
           set -o pipefail
 
+          # Write the token to a secure temp file. Prow's SecretAgent
+          # re-reads --github-token-path periodically, so a process
+          # substitution FIFO (consumed on first read) causes 401s on
+          # subsequent API calls.
           TOKEN_FILE=$(mktemp)
           trap 'rm -f "$TOKEN_FILE"' EXIT
           install -m 0600 /dev/null "$TOKEN_FILE"
@@ -87,9 +97,10 @@ jobs:
             --fix-org-members
             --fix-teams
             --fix-team-members
+            --fix-repos
             --fix-team-repos
             --min-admins 2
-            --required-admins=jflowers
+            --required-admins jflowers
             --require-self=false
             --ignore-enterprise-teams
             --ignore-secret-teams

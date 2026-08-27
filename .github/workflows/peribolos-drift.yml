@@ -3,36 +3,39 @@
 #
 # Approach: runs peribolos in dry-run mode (without --confirm) and checks if it
 # would make any changes. If mutation log lines exist, drift is detected.
+# This avoids `peribolos --dump` which calls GET /user (incompatible with
+# installation tokens).
 name: "Peribolos: Drift"
 
 on:
   schedule:
-    # Monday at 04:30 UTC — before daily reconciliation at 05:30 UTC
+    # Monday at 04:30 UTC — drift issues visible by EU morning (06:30 CEST / 05:30 CET),
+    # before daily reconciliation at 05:30 UTC
     - cron: '30 4 * * 1'
   workflow_dispatch:
 
 jobs:
   detect-drift:
-    if: github.repository == 'unbound-force/.github'
+    if: github.repository_owner == 'unbound-force'
     runs-on: ubuntu-latest
     timeout-minutes: 20
     permissions:
       contents: read
       issues: write
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - name: Checkout unbound-force/.github repo
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Install Go
-        uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c # v6.4.0
+        uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
         with:
           go-version-file: './go.mod'
 
-      - name: Copy config
-        run: cp org/config.yaml /tmp
+      - name: Copy org/config.yaml
+        run: cp org/config.yaml /tmp/config.yaml
 
-      - name: Checkout peribolos source
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - name: Checkout peribolos code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           repository: kubernetes-sigs/prow
           ref: 2b5fea27a177c767160452ba75dba978a88d8d63 # pin to known-good commit
@@ -53,13 +56,15 @@ jobs:
           app-id: ${{ secrets.APP_ID }}
           private-key: ${{ secrets.APP_PRIVATE_KEY }}
           owner: unbound-force
-          expires-in: 600
 
       - name: Run peribolos dry-run
         id: drift
         env:
           APP_TOKEN: ${{ steps.app-token.outputs.token }}
         run: |
+          # Write the token to a secure temp file. Prow's SecretAgent
+          # re-reads --github-token-path periodically, so a process
+          # substitution FIFO (consumed on first read) causes 401s.
           TOKEN_FILE=$(mktemp)
           trap 'rm -f "$TOKEN_FILE"' EXIT
           install -m 0600 /dev/null "$TOKEN_FILE"
@@ -71,9 +76,10 @@ jobs:
             --fix-org-members \
             --fix-teams \
             --fix-team-members \
+            --fix-repos \
             --fix-team-repos \
             --min-admins 2 \
-            --required-admins=jflowers \
+            --required-admins jflowers \
             --require-self=false \
             --ignore-enterprise-teams \
             --ignore-secret-teams \
@@ -116,6 +122,7 @@ jobs:
         id: existing-issue
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
         run: |
           ISSUE_NUMBER=$(gh issue list \
             --label peribolos-drift \
@@ -129,6 +136,7 @@ jobs:
         if: steps.drift.outputs.drift == 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
           ISSUE_NUMBER: ${{ steps.existing-issue.outputs.issue_number }}
           WORKFLOW_URL: "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
         run: |

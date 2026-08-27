@@ -5,7 +5,7 @@ orgs:
     default_repository_permission: read
     has_organization_projects: true
     has_repository_projects: true
-    members_can_create_repositories: true
+    members_can_create_repositories: false
 
     # Org members
     admins:
@@ -15,14 +15,53 @@ orgs:
       - yvonnedevlinrh
     members:
       - beatrizmcouto
+      - cdaniels255
       - em-redhat
       - gxmiranda
       - hbraswelrh
       - jpower432
+      - sedonnel
       - trevor-vaughan
       - tyraziel
-      - sedonnel
-      - cdaniels255
+
+    # Repos managed by peribolos
+    repos:
+      .github:
+        default_branch: main
+        description: Organization-wide GitHub configuration
+        has_projects: true
+      containerfile:
+        default_branch: main
+        description: ""
+        has_projects: true
+      dewey:
+        default_branch: main
+        description: "Knowledge graph MCP server for AI agents. 44 tools across Markdown vaults, semantic search, source code indexing, and persistent memory. Indexes local files, GitHub, web docs, and Go source code with local embeddings via Ollama."
+        has_projects: true
+      gaze:
+        default_branch: main
+        description: "Static analysis for Go that detects side effects and scores test quality -- know whether AI-generated tests actually verify behavior, not just cover lines."
+        has_projects: true
+      homebrew-tap:
+        default_branch: main
+        description: ""
+        has_projects: true
+      intake-kit:
+        default_branch: main
+        description: A CUE-validated PRD authoring and review system for structured project intake
+        has_projects: true
+      replicator:
+        default_branch: main
+        description: "Go MCP server providing 53 tools for AI agent orchestration: work tracking (Org), inter-agent messaging (Comms), task decomposition with git worktree isolation (Forge), and semantic memory via Dewey. Ships an embedded agent kit (commands, skills, agents) scaffolded by replicator init. 15MB binary, <50ms startup. Installable via brew install."
+        has_projects: true
+      unbound-force:
+        default_branch: main
+        description: AI agent swarm superhero team
+        has_projects: true
+      website:
+        default_branch: main
+        description: ""
+        has_projects: true
 
     # Teams
     teams:
@@ -31,18 +70,18 @@ orgs:
         privacy: closed
         members:
           - beatrizmcouto
+          - cdaniels255
           - em-redhat
           - gxmiranda
           - hbraswelrh
           - jpower432
-          - trevor-vaughan
-          - yvonnedevlinrh
           - sedonnel
-          - cdaniels255
+          - trevor-vaughan
         maintainers:
           - jflowers
           - marcusburghardt
           - sonupreetam
+          - yvonnedevlinrh
         repos:
           .github: write
           containerfile: write

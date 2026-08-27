@@ -1,0 +1,18 @@
+# Suborg: code repositories.
+# These repos contain source code and require strict security controls:
+# required code owner reviews, required status checks, and stale review
+# dismissal.
+#
+# Org-wide defaults from settings.yml are inherited automatically.
+# Only override settings here if code repos need different values
+# than the org-wide defaults.
+
+suborgrepos:
+  - containerfile
+  - dewey
+  - gaze
+  - homebrew-tap
+  - intake-kit
+  - replicator
+  - unbound-force
+  - website

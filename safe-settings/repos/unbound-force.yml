@@ -1,0 +1,38 @@
+# Repo-specific overrides for unbound-force.
+# Only fields that differ from the org/suborg defaults.
+
+repository:
+  has_discussions: true
+
+labels:
+  - name: hero
+    color: '006b75'
+    description: Hero architecture implementation
+
+  - name: phase-1
+    color: 0e8a16
+    description: "Phase 1: Hero Architectures"
+
+  - name: phase-2
+    color: fbca04
+    description: "Phase 2: Cross-Cutting Concerns"
+
+  - name: spec-005
+    color: 1d76db
+    description: "Spec 005: The Divisor Architecture"
+
+  - name: spec-006
+    color: 5319e7
+    description: "Spec 006: Cobalt-Crush Architecture"
+
+  - name: spec-007
+    color: e99695
+    description: "Spec 007: Mx F Architecture"
+
+  - name: spec-008
+    color: f9d0c4
+    description: "Spec 008: Swarm Orchestration"
+
+  - name: spec-009
+    color: c2e0c6
+    description: "Spec 009: Shared Data Model"

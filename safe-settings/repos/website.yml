@@ -1,0 +1,15 @@
+# Repo-specific overrides for website.
+# Only fields that differ from the org/suborg defaults.
+
+labels:
+  - name: blog
+    color: e4e669
+    description: Blog post opportunity
+
+  - name: docs
+    color: 0075ca
+    description: Documentation updates needed
+
+  - name: tutorial
+    color: '7057ff'
+    description: Tutorial opportunity
