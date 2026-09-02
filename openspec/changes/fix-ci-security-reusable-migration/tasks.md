@@ -19,3 +19,4 @@
 - [ ] 4.1 Push the branch. In PR #40, confirm that both `OSV-Scanner` and `OpenSSF Scorecards` checks transition from FAILURE to SUCCESS (or neutral/skipped if the repo lacks OIDC publish rights for Scorecards). Verify the `Dependency Review` check is the only remaining failure (addressed separately by issue #41).
 
 <!-- spec-review: passed -->
+<!-- code-review: passed -->
