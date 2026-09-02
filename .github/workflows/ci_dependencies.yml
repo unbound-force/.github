@@ -1,7 +1,20 @@
 name: Dependencies
 
 # --------------------------------------------------------------------------
-# Dependency review for all PRs.
+# Dependency review for all PRs, delegated to the org-infra reusable
+# workflows (matching ci_security.yml / ci_scheduled.yml in this repo).
+#
+# Dependency review is SOFT-GATED: reusable_deps_reviewer.yml wraps
+# actions/dependency-review-action with continue-on-error: true, so a
+# missing Dependency Graph (GitHub Advanced Security is not enabled on
+# this repo) no longer hard-fails every PR. The result is surfaced as an
+# output rather than as a blocking gate. Re-evaluate this soft-gate if the
+# Dependency Graph / GitHub Advanced Security is ever enabled here.
+#
+# The Dependabot comment and auto-approve jobs from the canonical org
+# pattern are intentionally OMITTED: this repo governs org policy
+# (Peribolos, safe-settings, rulesets), so auto-approving Dependabot PRs
+# here is an elevated attack surface pending a separate threat-model review.
 # --------------------------------------------------------------------------
 
 on:
@@ -11,15 +24,14 @@ on:
 
 permissions:
   contents: read
+  issues: none
+  pull-requests: none
 
 jobs:
-  dependency-review:
-    name: Dependency Review
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    steps:
-      - name: Checkout
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+  call_deps_reviewer:
+    name: General
+    uses: complytime/org-infra/.github/workflows/reusable_deps_reviewer.yml@0c784711926c9864f027ec565fd7c06a382d80f8 # v0.7.1
 
-      - name: Dependency Review
-        uses: actions/dependency-review-action@da24556b548a50705dd671f47852072ea4c105d9 # v4.7.1
+  call_dependabot_reviewer:
+    name: Dependabot
+    uses: complytime/org-infra/.github/workflows/reusable_dependabot_reviewer.yml@0c784711926c9864f027ec565fd7c06a382d80f8 # v0.7.1
