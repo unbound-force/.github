@@ -72,6 +72,26 @@ labels:
     color: ffffff
     description: This will not be worked on
 
+  - name: refactor
+    color: fbca04
+    description: Code restructuring with no behavior change
+
+  - name: test
+    color: 0e8a16
+    description: Test additions, changes, or coverage work
+
+  - name: ci
+    color: 5319e7
+    description: CI/CD, GitHub Actions, or release-pipeline changes
+
+  - name: dependencies
+    color: 0366d6
+    description: Dependency updates or dependency management
+
+  - name: security
+    color: b60205
+    description: Security-related work, fixes, or hardening
+
 # Rulesets applied at the org level.
 # These create GitHub rulesets visible under Settings > Rules > Rulesets.
 rulesets:
