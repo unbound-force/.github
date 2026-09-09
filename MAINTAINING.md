@@ -126,6 +126,26 @@ make safe-settings-validate
 make sanity
 ```
 
+## Workflow Scaffold Maintenance
+
+The OpenSpec and Speckit commands, scripts, templates, constitutions, specs, and
+schemas are tracked so a fresh clone has complete workflow support. Installer
+metadata under `.specify/` and runtime state under `.uf/` are regenerated
+locally and are not tracked.
+
+Refresh the scaffold on a dedicated branch so generated changes receive a
+separate review from organization configuration:
+
+```bash
+specify init --here --force --non-interactive --integration opencode
+uf init
+git diff -- .opencode .specify openspec AGENTS.md opencode.json
+```
+
+Review the diff before committing. Preserve the project constitution, existing
+OpenSpec changes, and repository-specific guidance when reconciling upstream
+updates. Run `uf doctor` and `make sanity` after the refresh.
+
 ## Applying Safe-settings Changes
 
 safe-settings reads its config from the `.github` repo's default branch
