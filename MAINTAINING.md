@@ -108,6 +108,7 @@ validator script in `deployment-settings.yml` via a reviewed PR.
 ### Prerequisites
 
 - Go (version in `go.mod`)
+- Node.js 22 or newer (for the local Safe Settings runner behavior test)
 - `yamllint` (for YAML validation)
 
 ### Commands

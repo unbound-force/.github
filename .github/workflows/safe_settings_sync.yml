@@ -26,12 +26,12 @@ name: Safe Settings Sync
       version:
         description: >-
           safe-settings commit SHA or tag to use.
-          Default is 2.1.18 (last version compatible with Probot v13).
+          Default is the reviewed commit containing the rename-race fix.
           Includes workaround for check_suite bug (#818) in full-sync
           mode. See TODO(safe-settings-818) in the sync step.
         required: false
         type: string
-        default: '594f3c706de6c4ddafb1a86dfa7468f19337e54f'
+        default: '6a8b6ae084987025f6c5de85e3cc6df140f64502'
 
 permissions:
   contents: none
@@ -145,6 +145,7 @@ jobs:
 
           async function performFullSync (appFn, nop) {
             const probot = createProbot()
+            await probot.ready()
             probot.log.info(`Starting full sync with NOP=${nop}`)
             try {
               const app = appFn(probot, {})
