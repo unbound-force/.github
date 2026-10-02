@@ -5,6 +5,7 @@
 - [x] 1.1 Pin `.github/workflows/safe_settings_sync.yml` to Safe Settings commit `6a8b6ae084987025f6c5de85e3cc6df140f64502` and verify a regression test asserts the exact immutable SHA.
 - [x] 1.2 Adapt the workflow's existing custom full-sync runner to wait for Probot 14 readiness before logger access and application loading; verify the focused runner/workflow test passes.
 - [x] 1.3 Preserve the exact predicate `String(error).includes("Cannot read properties of undefined (reading 'check_suite')")`, add tests proving that exact failure remains non-fatal while similar and unrelated exceptions/settings errors fail, and verify those tests pass.
+- [x] 1.4 Restrict scoped sync input to unique managed repository names and add regression coverage for its validation.
 
 ## 2. Preserve Labels
 

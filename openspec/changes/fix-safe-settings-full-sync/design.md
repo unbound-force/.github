@@ -11,11 +11,12 @@ See `proposal.md` for motivation. The current workflow pins Safe Settings 2.1.18
 - Upgrade to the immutable Safe Settings revision containing the rename-race fix.
 - Make the existing custom runner compatible with Probot 14.
 - Preserve the current narrow `check_suite` workaround.
+- Restrict scoped sync input to managed repository names.
 - Make label synchronization non-destructive and keep the `ci` color as a string.
 
 **Non-Goals:**
 
-- Redesign the workflow, rollout process, repository scoping, or organization governance.
+- Redesign the workflow, rollout process, or organization governance.
 - Add new evidence formats, dependency policy, approval systems, or branch-protection automation.
 - Change settings unrelated to labels and full-sync compatibility.
 
@@ -34,6 +35,10 @@ Preserve the existing predicate `String(error).includes("Cannot read properties 
 ### Preserve undeclared labels
 
 Convert label declarations to Safe Settings' additive include/exclude form so configured labels are managed while undeclared labels are preserved. Quote only the `ci` label color as `'5319e7'` for this change.
+
+### Restrict scoped sync input
+
+Accept only unique, plain repository names that appear in the Safe Settings managed-repository allowlist. Reject invalid, unmanaged, and duplicate names before generating the scoped deployment configuration.
 
 ## Risks / Trade-offs
 

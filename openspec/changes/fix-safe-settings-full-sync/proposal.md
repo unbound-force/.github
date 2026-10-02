@@ -9,6 +9,7 @@ Safe Settings 2.1.18 has an upstream rename race that can mix repository configu
 - Upgrade Safe Settings to a reviewed immutable commit containing the rename-race fix.
 - Adapt the custom full-sync runner in `.github/workflows/safe_settings_sync.yml` for Probot 14 initialization.
 - Preserve and validate the existing `check_suite` full-sync workaround.
+- Restrict scoped sync input to managed repository names.
 - Quote the `ci` label color as `'5319e7'`.
 - Preserve labels that are not explicitly managed by Safe Settings.
 

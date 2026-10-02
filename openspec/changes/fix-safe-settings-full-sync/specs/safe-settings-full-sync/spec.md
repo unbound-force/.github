@@ -41,3 +41,10 @@ Safe Settings SHALL preserve labels that are not explicitly declared for managem
 #### Scenario: CI label is loaded
 - **WHEN** Safe Settings loads the `ci` label
 - **THEN** its color is the string `5319e7`
+
+### Requirement: Scoped sync targets are managed repositories
+The workflow SHALL accept only unique, managed repository names when a scoped sync is requested.
+
+#### Scenario: Scoped sync receives an invalid target
+- **WHEN** a scoped sync includes an invalid, unmanaged, or duplicate repository name
+- **THEN** the workflow fails before generating deployment configuration
