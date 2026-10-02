@@ -202,9 +202,9 @@ Go to Actions > "Peribolos: Apply" > "Run workflow". Set `dry-run` to
 
 Go to Actions > "Safe Settings Sync" > "Run workflow":
 - **dry-run**: `true` to preview, `false` to apply (defaults to `true`)
-- **repos**: comma-separated list of repos to target (e.g.,
-  `dewey,gaze`). Leave empty to apply to all managed
-  repos.
+- **repos**: comma-separated list of unique, Safe Settings-managed repos to
+  target (e.g., `dewey,gaze`). Invalid, unmanaged, and duplicate names fail
+  validation. Leave empty to apply to all managed repos.
 
 ### Future automation
 
