@@ -44,6 +44,6 @@ Convert label declarations to Safe Settings' additive include/exclude form so co
 ## Validation
 
 - Unit-level Go workflow/configuration tests read local files only and cover the immutable SHA, Probot readiness wait, exact workaround predicate, non-matching errors, additive label structure, and the `ci` color string.
-- The six specification scenarios have 100% test mapping: each scenario is covered by at least one focused test. Any new helper code introduced for validation targets 100% statement coverage, while the existing repository coverage ratchet remains enforced by `make test-unit`.
+- The six specification scenarios have 100% test mapping: each scenario is covered by at least one focused behavioral test. This change introduces no production helpers; CI executes the focused tests through `make test-unit`.
 - A reviewed Safe Settings dry run is the integration check for the pinned upstream runtime; automated tests require no GitHub service or network access.
 - Run the focused tests, `make safe-settings-validate`, `make test-unit`, and strict OpenSpec validation.
