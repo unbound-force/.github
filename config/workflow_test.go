@@ -24,9 +24,27 @@ func readSafeSettingsWorkflow(t *testing.T) string {
 func TestSafeSettingsWorkflow_PinsReviewedCommit(t *testing.T) {
 	workflow := readSafeSettingsWorkflow(t)
 
-	const pinnedDefault = "default: '6a8b6ae084987025f6c5de85e3cc6df140f64502'"
-	if !strings.Contains(workflow, pinnedDefault) {
-		t.Errorf("Safe Settings workflow must contain %q", pinnedDefault)
+	const pinnedRevision = "ref: '6a8b6ae084987025f6c5de85e3cc6df140f64502'"
+	if !strings.Contains(workflow, pinnedRevision) {
+		t.Errorf("Safe Settings workflow must contain %q", pinnedRevision)
+	}
+	if strings.Contains(workflow, "inputs.version") {
+		t.Error("Safe Settings workflow must not allow overriding the reviewed revision")
+	}
+}
+
+func TestSafeSettingsWorkflow_ValidatesScopedRepositories(t *testing.T) {
+	workflow := readSafeSettingsWorkflow(t)
+
+	for _, required := range []string{
+		"allowed_repos",
+		`^[A-Za-z0-9][A-Za-z0-9._-]*$`,
+		"Repository is not managed by Safe Settings",
+		"Repository was specified more than once",
+	} {
+		if !strings.Contains(workflow, required) {
+			t.Errorf("Safe Settings workflow must validate scoped repositories with %q", required)
+		}
 	}
 }
 
