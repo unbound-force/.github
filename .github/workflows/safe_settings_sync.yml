@@ -96,10 +96,10 @@ jobs:
             echo ""
             yq -r 'del(.restrictedRepos) | select(. != null)' \
               safe-settings/deployment-settings.yml
-          } > /tmp/scoped-deployment-settings.yml
+          } > "$RUNNER_TEMP/scoped-deployment-settings.yml"
 
           echo "--- Generated deployment-settings.yml ---"
-          cat /tmp/scoped-deployment-settings.yml
+          cat "$RUNNER_TEMP/scoped-deployment-settings.yml"
 
       - name: Checkout safe-settings code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
@@ -126,7 +126,7 @@ jobs:
           ADMIN_REPO: .github
           CONFIG_PATH: safe-settings
           DEPLOYMENT_CONFIG_FILE: >-
-            ${{ inputs.repos != '' && '/tmp/scoped-deployment-settings.yml'
+            ${{ inputs.repos != '' && format('{0}/scoped-deployment-settings.yml', runner.temp)
             || format('{0}/safe-settings/deployment-settings.yml', github.workspace) }}
           FULL_SYNC_NOP: ${{ inputs.dry-run }}
           LOG_LEVEL: ${{ inputs.dry-run && 'debug' || 'info' }}

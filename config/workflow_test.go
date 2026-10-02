@@ -34,17 +34,58 @@ func TestSafeSettingsWorkflow_PinsReviewedCommit(t *testing.T) {
 }
 
 func TestSafeSettingsWorkflow_ValidatesScopedRepositories(t *testing.T) {
-	workflow := readSafeSettingsWorkflow(t)
+	scopedSync := extractScopedSync(t, readSafeSettingsWorkflow(t))
 
-	for _, required := range []string{
-		"allowed_repos",
-		`^[A-Za-z0-9][A-Za-z0-9._-]*$`,
-		"Repository is not managed by Safe Settings",
-		"Repository was specified more than once",
-	} {
-		if !strings.Contains(workflow, required) {
-			t.Errorf("Safe Settings workflow must validate scoped repositories with %q", required)
-		}
+	testCases := []struct {
+		name             string
+		targetRepos      string
+		wantExitCode     int
+		wantConfig       string
+		wantOutput       string
+		wantConfigExists bool
+	}{
+		{
+			name:             "managed repository succeeds",
+			targetRepos:      "dewey",
+			wantConfig:       "    - dewey\n",
+			wantConfigExists: true,
+		},
+		{
+			name:         "invalid repository fails",
+			targetRepos:  "*",
+			wantExitCode: 1,
+			wantOutput:   "Invalid repository name: *",
+		},
+		{
+			name:         "unmanaged repository fails",
+			targetRepos:  "unmanaged",
+			wantExitCode: 1,
+			wantOutput:   "Repository is not managed by Safe Settings: unmanaged",
+		},
+		{
+			name:         "duplicate repository fails",
+			targetRepos:  "dewey,dewey",
+			wantExitCode: 1,
+			wantOutput:   "Repository was specified more than once: dewey",
+		},
+	}
+
+	for _, testCase := range testCases {
+		t.Run(testCase.name, func(t *testing.T) {
+			exitCode, output, configuration, configurationExists := runScopedSync(t, scopedSync, testCase.targetRepos)
+			if exitCode != testCase.wantExitCode {
+				t.Errorf("scoped sync exit code = %d, want %d; output: %s", exitCode, testCase.wantExitCode, output)
+			}
+			if testCase.wantOutput != "" && !strings.Contains(output, testCase.wantOutput) {
+				t.Errorf("scoped sync output must contain %q; got %q", testCase.wantOutput, output)
+			}
+			if configurationExists != testCase.wantConfigExists {
+				t.Errorf("scoped configuration exists = %t, want %t", configurationExists, testCase.wantConfigExists)
+			}
+			if testCase.wantConfig != "" && !strings.Contains(configuration, testCase.wantConfig) {
+				t.Errorf("scoped configuration must contain %q; got %q", testCase.wantConfig, configuration)
+			}
+		})
 	}
 }
 
@@ -138,6 +179,28 @@ func extractFullSyncRunner(t *testing.T, workflow string) string {
 	return strings.Join(lines, "\n")
 }
 
+func extractScopedSync(t *testing.T, workflow string) string {
+	t.Helper()
+
+	const startMarker = "          echo \"Scoping safe-settings to repos: $TARGET_REPOS\"\n"
+	const endMarker = "\n\n      - name: Checkout safe-settings code"
+	start := strings.Index(workflow, startMarker)
+	if start == -1 {
+		t.Fatal("Safe Settings workflow must define scoped sync generation")
+	}
+	start += len(startMarker)
+	end := strings.Index(workflow[start:], endMarker)
+	if end == -1 {
+		t.Fatal("Safe Settings workflow must terminate scoped sync generation")
+	}
+
+	lines := strings.Split(workflow[start:start+end], "\n")
+	for index := range lines {
+		lines[index] = strings.TrimPrefix(lines[index], "          ")
+	}
+	return strings.Join(lines, "\n")
+}
+
 func runFullSyncRunner(t *testing.T, runner, exception string, settingsError bool) (int, string) {
 	t.Helper()
 
@@ -172,6 +235,46 @@ func runFullSyncRunner(t *testing.T, runner, exception string, settingsError boo
 		t.Fatalf("run patched full-sync runner: %v", err)
 	}
 	return exitError.ExitCode(), string(output)
+}
+
+func runScopedSync(t *testing.T, scopedSync, targetRepos string) (int, string, string, bool) {
+	t.Helper()
+
+	testDirectory := t.TempDir()
+	writeTestFile(t, filepath.Join(testDirectory, "safe-settings", "deployment-settings.yml"), "restrictedRepos: {}\n")
+	writeTestFile(t, filepath.Join(testDirectory, "bin", "yq"), `#!/usr/bin/env bash
+if [[ "$1" == "-r" && "$2" == ".restrictedRepos.include[]" ]]; then
+  printf '%s\n' dewey website
+else
+  printf 'configvalidators: []\n'
+fi
+`)
+	if err := os.Chmod(filepath.Join(testDirectory, "bin", "yq"), 0o755); err != nil {
+		t.Fatalf("make mock yq executable: %v", err)
+	}
+
+	command := exec.Command("bash", "-c", scopedSync)
+	command.Dir = testDirectory
+	command.Env = append(os.Environ(),
+		"TARGET_REPOS="+targetRepos,
+		"RUNNER_TEMP="+testDirectory,
+		"PATH="+filepath.Join(testDirectory, "bin")+":"+os.Getenv("PATH"),
+	)
+	output, err := command.CombinedOutput()
+	configurationPath := filepath.Join(testDirectory, "scoped-deployment-settings.yml")
+	configuration, readErr := os.ReadFile(configurationPath)
+	configurationExists := readErr == nil
+	if readErr != nil && !os.IsNotExist(readErr) {
+		t.Fatalf("read scoped deployment settings: %v", readErr)
+	}
+	if err == nil {
+		return 0, string(output), string(configuration), configurationExists
+	}
+	var exitError *exec.ExitError
+	if !errors.As(err, &exitError) {
+		t.Fatalf("run scoped sync: %v", err)
+	}
+	return exitError.ExitCode(), string(output), string(configuration), configurationExists
 }
 
 func writeTestFile(t *testing.T, path, contents string) {
