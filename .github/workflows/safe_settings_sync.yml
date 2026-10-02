@@ -26,7 +26,8 @@ name: Safe Settings Sync
       version:
         description: >-
           safe-settings commit SHA or tag to use.
-          Default is the reviewed commit containing the rename-race fix.
+          Default is v2.1.19, the reviewed immutable revision with the
+          rename-race fix and Probot 14 compatibility updates.
           Includes workaround for check_suite bug (#818) in full-sync
           mode. See TODO(safe-settings-818) in the sync step.
         required: false
@@ -125,7 +126,7 @@ jobs:
           fi
           # --- Workaround for upstream check_suite bug ---
           #
-          # safe-settings v2.1.18 crashes in full-sync mode because
+          # safe-settings v2.1.19 crashes in full-sync mode because
           # handleResults accesses payload.check_suite which is
           # undefined outside the webhook flow. The sync itself
           # completes; only the Check Run reporting fails.
