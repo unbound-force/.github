@@ -23,15 +23,6 @@ name: Safe Settings Sync
         required: false
         type: string
         default: ''
-      version:
-        description: >-
-          safe-settings commit SHA or tag to use.
-          Default is 2.1.18 (last version compatible with Probot v13).
-          Includes workaround for check_suite bug (#818) in full-sync
-          mode. See TODO(safe-settings-818) in the sync step.
-        required: false
-        type: string
-        default: '594f3c706de6c4ddafb1a86dfa7468f19337e54f'
 
 permissions:
   contents: none
@@ -64,13 +55,33 @@ jobs:
         run: |
           echo "Scoping safe-settings to repos: $TARGET_REPOS"
 
-          # Build an include (allowlist) from the target repos.
-          # Uses the same format as deployment-settings.yml: plain names
-          # matched by safe-settings via glob/minimatch (not regex).
+          # Build an include allowlist from explicitly managed repository names.
+          mapfile -t ALLOWED_REPOS < <(
+            yq -r '.restrictedRepos.include[]' safe-settings/deployment-settings.yml
+          )
+          declare -A allowed_repos
+          declare -A selected_repos
+          for repo in "${ALLOWED_REPOS[@]}"; do
+            allowed_repos["$repo"]=1
+          done
+
           INCLUDE_LIST=""
           IFS=',' read -ra TARGETS <<< "$TARGET_REPOS"
           for target in "${TARGETS[@]}"; do
             target=$(echo "$target" | xargs)  # trim whitespace
+            if [[ ! "$target" =~ ^[A-Za-z0-9][A-Za-z0-9._-]*$ ]]; then
+              echo "Invalid repository name: $target" >&2
+              exit 1
+            fi
+            if [[ -z "${allowed_repos[$target]+x}" ]]; then
+              echo "Repository is not managed by Safe Settings: $target" >&2
+              exit 1
+            fi
+            if [[ -n "${selected_repos[$target]+x}" ]]; then
+              echo "Repository was specified more than once: $target" >&2
+              exit 1
+            fi
+            selected_repos["$target"]=1
             INCLUDE_LIST="${INCLUDE_LIST}    - ${target}"$'\n'
           done
 
@@ -85,16 +96,16 @@ jobs:
             echo ""
             yq -r 'del(.restrictedRepos) | select(. != null)' \
               safe-settings/deployment-settings.yml
-          } > /tmp/scoped-deployment-settings.yml
+          } > "$RUNNER_TEMP/scoped-deployment-settings.yml"
 
           echo "--- Generated deployment-settings.yml ---"
-          cat /tmp/scoped-deployment-settings.yml
+          cat "$RUNNER_TEMP/scoped-deployment-settings.yml"
 
       - name: Checkout safe-settings code
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
         with:
           repository: github/safe-settings
-          ref: ${{ inputs.version }}
+          ref: '6a8b6ae084987025f6c5de85e3cc6df140f64502'
           path: ${{ env.SAFE_SETTINGS_CODE_DIR }}
 
       - name: Setup Node.js
@@ -115,7 +126,7 @@ jobs:
           ADMIN_REPO: .github
           CONFIG_PATH: safe-settings
           DEPLOYMENT_CONFIG_FILE: >-
-            ${{ inputs.repos != '' && '/tmp/scoped-deployment-settings.yml'
+            ${{ inputs.repos != '' && format('{0}/scoped-deployment-settings.yml', runner.temp)
             || format('{0}/safe-settings/deployment-settings.yml', github.workspace) }}
           FULL_SYNC_NOP: ${{ inputs.dry-run }}
           LOG_LEVEL: ${{ inputs.dry-run && 'debug' || 'info' }}
@@ -125,7 +136,7 @@ jobs:
           fi
           # --- Workaround for upstream check_suite bug ---
           #
-          # safe-settings v2.1.18 crashes in full-sync mode because
+          # safe-settings v2.1.19 crashes in full-sync mode because
           # handleResults accesses payload.check_suite which is
           # undefined outside the webhook flow. The sync itself
           # completes; only the Check Run reporting fails.
@@ -145,6 +156,7 @@ jobs:
 
           async function performFullSync (appFn, nop) {
             const probot = createProbot()
+            await probot.ready()
             probot.log.info(`Starting full sync with NOP=${nop}`)
             try {
               const app = appFn(probot, {})

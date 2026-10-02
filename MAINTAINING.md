@@ -85,7 +85,10 @@ that differ from its suborg defaults.
 2. Set only the fields that differ from the suborg/org defaults.
 3. Do NOT set peribolos-owned fields (`description`, `has_projects`,
    `default_branch`).
-4. Submit a PR. CI boundary tests validate the override.
+4. Keep label declarations additive: retain the catch-all label exclusion so
+   labels not explicitly managed by Safe Settings are preserved. Treat label
+   deletion as a separately reviewed change.
+5. Submit a PR. CI boundary tests validate the override.
 
 ## Override Validator Policies
 
@@ -108,6 +111,7 @@ validator script in `deployment-settings.yml` via a reviewed PR.
 ### Prerequisites
 
 - Go (version in `go.mod`)
+- Node.js 22 or newer (for the local Safe Settings runner behavior test)
 - `yamllint` (for YAML validation)
 
 ### Commands
@@ -198,9 +202,9 @@ Go to Actions > "Peribolos: Apply" > "Run workflow". Set `dry-run` to
 
 Go to Actions > "Safe Settings Sync" > "Run workflow":
 - **dry-run**: `true` to preview, `false` to apply (defaults to `true`)
-- **repos**: comma-separated list of repos to target (e.g.,
-  `dewey,gaze`). Leave empty to apply to all managed
-  repos.
+- **repos**: comma-separated list of unique, Safe Settings-managed repos to
+  target (e.g., `dewey,gaze`). Invalid, unmanaged, and duplicate names fail
+  validation. Leave empty to apply to all managed repos.
 
 ### Future automation
 
