@@ -23,7 +23,7 @@ labels:
       description: "Spec 005: The Divisor Architecture"
 
     - name: spec-006
-      color: 5319e7
+      color: 5319ef
       description: "Spec 006: Cobalt-Crush Architecture"
 
     - name: spec-007
