@@ -23,6 +23,7 @@ orgs:
       - sedonnel
       - trevor-vaughan
       - tyraziel
+      - uf-divisor
 
     # Repos managed by peribolos
     repos:
@@ -77,6 +78,7 @@ orgs:
           - jpower432
           - sedonnel
           - trevor-vaughan
+          - uf-divisor
         maintainers:
           - jflowers
           - marcusburghardt
