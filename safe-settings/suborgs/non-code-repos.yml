@@ -7,6 +7,6 @@
 # Only override settings here if non-code repos need different values
 # than the org-wide defaults.
 
-# Currently no non-code repos exist. Add repos here as they are created.
-# suborgrepos:
-#   - example-repo
+# homebrew-tap holds generated formulae, pushed by release automation.
+suborgrepos:
+  - homebrew-tap

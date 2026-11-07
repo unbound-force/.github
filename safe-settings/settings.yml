@@ -99,6 +99,9 @@ labels:
 # These create GitHub rulesets visible under Settings > Rules > Rulesets.
 rulesets:
   # Ruleset for code repositories — strict branch protection.
+  # homebrew-tap is left out: release automation pushes straight to its
+  # main, and this ruleset has no bypass list. Its classic branch
+  # protection stays in place.
   - name: "safe-settings: code repos"
     target: branch
     enforcement: active
@@ -113,7 +116,6 @@ rulesets:
           - containerfile
           - dewey
           - gaze
-          - homebrew-tap
           - intake-kit
           - replicator
           - unbound-force
