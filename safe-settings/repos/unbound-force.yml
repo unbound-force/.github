@@ -39,3 +39,26 @@ labels:
       description: "Spec 009: Shared Data Model"
   exclude:
     - name: ".*"
+
+# Required checks for this repo only. The org ruleset is shared, so a check
+# there would be required in repos that never run it. GitHub applies both
+# rulesets, so the org ruleset's approval rule still holds.
+rulesets:
+  - name: "safe-settings: unbound-force required checks"
+    target: branch
+    enforcement: active
+
+    conditions:
+      ref_name:
+        include:
+          - "~DEFAULT_BRANCH"
+        exclude: []
+
+    rules:
+      - type: required_status_checks
+        parameters:
+          strict_required_status_checks_policy: false
+          required_status_checks:
+            - context: "Build and Test"
+            - context: "Plugin Tests"
+            - context: "Standardized CI / Run linters"
