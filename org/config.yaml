@@ -39,6 +39,10 @@ orgs:
         default_branch: main
         description: "Knowledge graph MCP server for AI agents. 44 tools across Markdown vaults, semantic search, source code indexing, and persistent memory. Indexes local files, GitHub, web docs, and Go source code with local embeddings via Ollama."
         has_projects: true
+      eval-infra:
+        default_branch: main
+        description: Shared eval tooling for opencode token efficiency and efficacy
+        has_projects: true
       gaze:
         default_branch: main
         description: "Static analysis for Go that detects side effects and scores test quality -- know whether AI-generated tests actually verify behavior, not just cover lines."
@@ -88,6 +92,7 @@ orgs:
           .github: write
           containerfile: write
           dewey: write
+          eval-infra: write
           gaze: write
           homebrew-tap: write
           intake-kit: write

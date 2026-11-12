@@ -8,6 +8,7 @@
 //   - No repo appears in multiple suborg files
 //   - Safe-settings config does not set fields owned by peribolos
 //   - Suborg repo lists match ruleset repository_name conditions
+//   - Every suborg repo is on the deployment restrictedRepos allowlist
 package config
 
 import (
@@ -407,6 +408,45 @@ func TestBoundary_SuborgReposMatchRulesetConditions(t *testing.T) {
 					t.Errorf("repo %q is in ruleset %q repository_name.include but missing from suborg %s",
 						repo, rs.Name, suborgName+".yml")
 				}
+			}
+		}
+	}
+}
+
+// deploymentSettings represents the parts of deployment-settings.yml the
+// boundary tests read.
+type deploymentSettings struct {
+	RestrictedRepos struct {
+		Include []string `json:"include"`
+	} `json:"restrictedRepos"`
+}
+
+// TestBoundary_SuborgReposAreRestrictedRepos checks that every repo in a
+// suborg file is on the deployment restrictedRepos allowlist. Safe-settings
+// ignores repos missing from that list, so a repo added only to a suborg
+// and its ruleset would silently get no settings or branch protection.
+func TestBoundary_SuborgReposAreRestrictedRepos(t *testing.T) {
+	data, err := os.ReadFile(filepath.Join(safeSettingsDir, "deployment-settings.yml"))
+	if err != nil {
+		t.Fatalf("failed to read deployment-settings.yml: %v", err)
+	}
+	var deployment deploymentSettings
+	if err := yaml.Unmarshal(data, &deployment); err != nil {
+		t.Fatalf("failed to parse deployment-settings.yml: %v", err)
+	}
+	allowed := make(map[string]bool)
+	for _, repo := range deployment.RestrictedRepos.Include {
+		allowed[repo] = true
+	}
+
+	suborgs, err := loadSuborgs(safeSettingsDir)
+	if err != nil {
+		t.Fatalf("failed to load suborgs: %v", err)
+	}
+	for fileName, repos := range suborgs {
+		for _, repo := range repos {
+			if !allowed[repo] {
+				t.Errorf("suborg file %s lists repo %q, which is missing from restrictedRepos.include in deployment-settings.yml", fileName, repo)
 			}
 		}
 	}

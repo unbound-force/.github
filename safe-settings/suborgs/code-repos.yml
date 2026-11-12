@@ -10,6 +10,7 @@
 suborgrepos:
   - containerfile
   - dewey
+  - eval-infra
   - gaze
   - intake-kit
   - replicator
