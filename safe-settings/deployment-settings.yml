@@ -16,6 +16,7 @@ restrictedRepos:
   include:
     - containerfile
     - dewey
+    - eval-infra
     - gaze
     - homebrew-tap
     - intake-kit

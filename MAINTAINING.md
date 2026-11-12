@@ -64,10 +64,33 @@ every PR via CI.
    in `safe-settings/settings.yml`. **Both files must be updated** -- the
    suborg controls settings inheritance, the ruleset controls branch
    protection.
-5. Submit a PR. CI boundary tests validate consistency.
-6. After merge, peribolos creates the repo and sets team permissions.
-7. Trigger `workflow_dispatch` on the "Safe Settings Sync" workflow to
+5. Add the repo to `restrictedRepos.include` in
+   `safe-settings/deployment-settings.yml`. Safe-settings manages only the
+   repos on that allowlist and silently ignores every other repo.
+6. Submit a PR. CI boundary tests validate consistency.
+7. After merge, peribolos creates the repo and sets team permissions.
+8. Trigger `workflow_dispatch` on the "Safe Settings Sync" workflow to
    apply repo settings.
+
+### Transfer an Existing Repository into the Org
+
+Peribolos runs with `--fix-repos`, so it creates any repo in
+`org/config.yaml` that does not exist yet. If the config change lands
+before the transfer, peribolos creates an empty repo with the same name
+and the transfer then fails. Transfer first, then merge:
+
+1. Open the PR with every change from "Add a New Repository", copying
+   the repo's current `description` and `has_projects` so peribolos does
+   not change them. Leave the PR unmerged.
+2. Prepare the repo for the code-repos ruleset: a `CODEOWNERS` file and
+   the status checks it will require.
+3. Transfer the repo to `unbound-force` (an org admin, since members
+   cannot create repositories).
+4. Merge the PR. Peribolos adopts the existing repo and applies team
+   permissions.
+5. Run "Safe Settings Sync" in dry-run mode for the repo alone, then
+   apply it.
+6. Grant the repo access to any org secrets it needs.
 
 ### Change Branch Protection Rules or Rulesets
 
