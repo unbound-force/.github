@@ -43,6 +43,13 @@ labels:
 # Required checks for this repo only. The org ruleset is shared, so a check
 # there would be required in repos that never run it. GitHub applies both
 # rulesets, so the org ruleset's approval rule still holds.
+#
+# The required checks are the aggregate jobs from unbound-force's
+# ci_local.yml ("CI OK") and ci_checks.yml ("Standardized CI OK"). Each runs
+# under if: always() and fails unless every job it gates succeeded or was
+# skipped, so PRs that only add Dewey learnings can skip the heavy jobs and
+# still pass. Do not require "Standardized CI / Run linters" again: a skipped
+# reusable-workflow caller never reports that nested check.
 rulesets:
   - name: "safe-settings: unbound-force required checks"
     target: branch
@@ -59,6 +66,5 @@ rulesets:
         parameters:
           strict_required_status_checks_policy: false
           required_status_checks:
-            - context: "Build and Test"
-            - context: "Plugin Tests"
-            - context: "Standardized CI / Run linters"
+            - context: "CI OK"
+            - context: "Standardized CI OK"
