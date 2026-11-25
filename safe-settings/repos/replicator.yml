@@ -4,3 +4,57 @@
 # The repo's homepage: its page on the Unbound Force site.
 repository:
   homepage: https://unboundforce.dev/docs/projects/replicator/
+
+# Rulesets for this repo only. Repo-scoped rulesets are fully managed here:
+# a sync deletes any repo ruleset on replicator that isn't listed.
+rulesets:
+  # Required checks, moved here from the classic branch protection that
+  # replicator's .github/settings.yml set through the Settings app. Same two
+  # checks, but not strict: with auto-merge (jflowers/ship's
+  # deps-automerge.yml), each merge would otherwise leave every other open
+  # PR behind, and updating one needs a fresh approval. The org ruleset
+  # still requires the code owner's approval.
+  #
+  # "CI OK" is ci.yml's aggregate job, which always reports, even when
+  # build-and-test is skipped for learnings-only changes (replicator #182).
+  # "Standardized CI / Run linters" is never gated, so it always reports.
+  - name: "safe-settings: replicator required checks"
+    target: branch
+    enforcement: active
+
+    conditions:
+      ref_name:
+        include:
+          - "~DEFAULT_BRANCH"
+        exclude: []
+
+    rules:
+      - type: required_status_checks
+        parameters:
+          strict_required_status_checks_policy: false
+          required_status_checks:
+            - context: "CI OK"
+            - context: "Standardized CI / Run linters"
+
+  # Release tags are immutable: once a v* tag exists it can't be deleted or
+  # moved. Creation is allowed, so the release workflow can create the tag.
+  # Org admins may bypass to repair a bad tag. Declared as it already exists
+  # on replicator (created outside safe-settings), so a sync keeps it.
+  - name: release-tag-protection
+    target: tag
+    enforcement: active
+
+    conditions:
+      ref_name:
+        include:
+          - "refs/tags/v*"
+        exclude: []
+
+    bypass_actors:
+      - actor_id: null
+        actor_type: OrganizationAdmin
+        bypass_mode: always
+
+    rules:
+      - type: deletion
+      - type: non_fast_forward
