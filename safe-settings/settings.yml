@@ -29,6 +29,14 @@ repository:
   has_issues: true
   has_downloads: true
 
+  # Shared topic for every managed repo, so one topic search finds the
+  # whole family (zero-dot-force repos carry it too). safe-settings
+  # combines this list with any topics a repo file adds, and replaces a
+  # repo's full topic list on sync, so add topics here or in repo files,
+  # not in the GitHub UI.
+  topics:
+    - unbound-force
+
   # Dependabot vulnerability alerts and automated security fixes.
   security:
     enableVulnerabilityAlerts: true
