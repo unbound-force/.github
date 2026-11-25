@@ -1,0 +1,6 @@
+# Repo-specific overrides for replicator.
+# Only fields that differ from the org/suborg defaults.
+
+# The repo's homepage: its page on the Unbound Force site.
+repository:
+  homepage: https://unboundforce.dev/docs/projects/replicator/

@@ -4,6 +4,10 @@
 # Colors are quoted and keep GitHub's stored case: safe-settings compares
 # them as exact strings.
 
+# The repo's homepage: its page on the Unbound Force site.
+repository:
+  homepage: https://unboundforce.dev/docs/reference/sandbox/
+
 # gh-hud's hold label (it auto-merges PRs here). Without this entry a sync
 # would delete it, and with it the hold on any PR that carries it.
 labels:

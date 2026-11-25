@@ -4,7 +4,9 @@
 # Colors are quoted and keep GitHub's stored case: safe-settings compares
 # them as exact strings, and an unquoted 000000 would parse as a number.
 
+# The repo's homepage: its page on the Unbound Force site.
 repository:
+  homepage: https://unboundforce.dev/
   has_discussions: true
 
 labels:
