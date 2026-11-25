@@ -58,3 +58,76 @@ rulesets:
     rules:
       - type: deletion
       - type: non_fast_forward
+
+# Labels in use on issues and PRs. Without these entries the org's
+# exclude rule would delete them on a sync. hold and human-gate are
+# gh-hud's (it auto-merges PRs here); github_actions and go are
+# Dependabot's. Colors are quoted and keep GitHub's stored case:
+# safe-settings compares them as exact strings.
+labels:
+  include:
+    - name: "cleanup"
+      color: 'c5def5'
+      description: "Code hygiene and technical debt"
+
+    - name: "feature"
+      color: 'ededed'
+      description: ""
+
+    - name: "github_actions"
+      color: '000000'
+      description: "Pull requests that update GitHub Actions code"
+
+    - name: "go"
+      color: '16e2e2'
+      description: "Pull requests that update go code"
+
+    - name: "hold"
+      color: 'B60205'
+      description: "gh-hud: don't auto-merge; a person looks first"
+
+    - name: "needs-human"
+      color: 'D93F0B'
+      description: "Agent loop needs human intervention"
+
+    - name: "next-release"
+      color: 'c1c8f3'
+      description: ""
+
+    - name: "ready-for-merge"
+      color: '0E8A16'
+      description: "All reviewers approved \u2014 ready to merge"
+
+    - name: "ready-for-review"
+      color: '0E8A16'
+      description: "Triggers review agent dispatch"
+
+    - name: "ready-for-triage"
+      color: '0E8A16'
+      description: "Triggers triage agent dispatch"
+
+    - name: "ready-to-code"
+      color: '0E8A16'
+      description: "Triggers code agent dispatch"
+
+    - name: "requires-manual-review"
+      color: 'FBCA04'
+      description: "Review requires human judgment"
+
+    - name: "risk/elevated"
+      color: 'E4A221'
+      description: "PR risk: elevated"
+
+    - name: "risk/low"
+      color: '0E8A16'
+      description: "PR risk: low"
+
+    - name: "risk/moderate"
+      color: 'FBCA04'
+      description: "PR risk: moderate"
+
+    - name: "triaged"
+      color: 'ededed'
+      description: ""
+  exclude:
+    - name: ".*"
