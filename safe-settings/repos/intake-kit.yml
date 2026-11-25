@@ -1,0 +1,27 @@
+# Repo-specific overrides for intake-kit.
+# Only fields that differ from the org/suborg defaults.
+
+# Required checks for this repo only. The org ruleset is shared, so a check
+# there would be required in repos that never run it. GitHub applies both
+# rulesets, so the org ruleset's approval rule still holds.
+#
+# "test" is intake-kit's ci.yml job (task vet-examples).
+# jflowers/ship's deps-automerge.yml needs a required check before it
+# turns on auto-merge for a Dependabot PR, so nothing merges before CI.
+rulesets:
+  - name: "safe-settings: intake-kit required checks"
+    target: branch
+    enforcement: active
+
+    conditions:
+      ref_name:
+        include:
+          - "~DEFAULT_BRANCH"
+        exclude: []
+
+    rules:
+      - type: required_status_checks
+        parameters:
+          strict_required_status_checks_policy: false
+          required_status_checks:
+            - context: "test"
