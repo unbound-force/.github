@@ -72,7 +72,6 @@ labels:
 
     - name: "feature"
       color: 'ededed'
-      description: ""
 
     - name: "github_actions"
       color: '000000'
@@ -128,6 +127,5 @@ labels:
 
     - name: "triaged"
       color: 'ededed'
-      description: ""
   exclude:
     - name: ".*"
