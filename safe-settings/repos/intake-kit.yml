@@ -1,6 +1,10 @@
 # Repo-specific overrides for intake-kit.
 # Only fields that differ from the org/suborg defaults.
 
+# The repo's homepage: its page on the Unbound Force site.
+repository:
+  homepage: https://unboundforce.dev/docs/roadmap/#the-three-layer-intake-ecosystem
+
 # Required checks for this repo only. The org ruleset is shared, so a check
 # there would be required in repos that never run it. GitHub applies both
 # rulesets, so the org ruleset's approval rule still holds.
