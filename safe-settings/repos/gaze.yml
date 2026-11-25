@@ -14,11 +14,9 @@ labels:
   include:
     - name: "blocked"
       color: 'ededed'
-      description: ""
 
     - name: "feature"
       color: 'ededed'
-      description: ""
 
     - name: "hold"
       color: 'B60205'
@@ -30,7 +28,6 @@ labels:
 
     - name: "not-planned"
       color: 'ededed'
-      description: ""
 
     - name: "ready-for-merge"
       color: '0E8A16'
@@ -66,6 +63,5 @@ labels:
 
     - name: "triaged"
       color: 'ededed'
-      description: ""
   exclude:
     - name: ".*"
