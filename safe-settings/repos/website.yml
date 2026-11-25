@@ -14,5 +14,52 @@ labels:
     - name: tutorial
       color: '7057ff'
       description: Tutorial opportunity
+
+    # Labels in use on issues and PRs. Without these entries the exclude
+    # rule below would delete them. hold is gh-hud's: it keeps a PR from
+    # auto-merging. javascript is Dependabot's npm label.
+    - name: hold
+      color: 'B60205'
+      description: "gh-hud: don't auto-merge; a person looks first"
+
+    - name: javascript
+      color: '168700'
+      description: "Pull requests that update javascript code"
+
+    - name: llm_assisted
+      color: '7057ff'
+      description: "Changes created or assisted by AI/LLM agents"
+
+    - name: next-release
+      color: 'c1c8f3'
+      description: "Targeted for inclusion in next release but can be deferred if needed"
+
+    - name: release-ready
+      color: '0E8A16'
+      description: "Ready to ship with the next uf release"
   exclude:
     - name: ".*"
+
+# Required checks for this repo only. The org ruleset is shared, so a check
+# there would be required in repos that never run it. GitHub applies both
+# rulesets, so the org ruleset's approval rule still holds.
+#
+# "Build" is ci.yml's job: it builds the site as deploy-gh-pages.yml does.
+# gh-hud auto-merges PRs here, so nothing should merge before it passes.
+rulesets:
+  - name: "safe-settings: website required checks"
+    target: branch
+    enforcement: active
+
+    conditions:
+      ref_name:
+        include:
+          - "~DEFAULT_BRANCH"
+        exclude: []
+
+    rules:
+      - type: required_status_checks
+        parameters:
+          strict_required_status_checks_policy: false
+          required_status_checks:
+            - context: "Build"
