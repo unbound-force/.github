@@ -1,0 +1,47 @@
+# Repo-specific overrides for homebrew-tap.
+# Only fields that differ from the org/suborg defaults.
+#
+# Colors are quoted and keep GitHub's stored case: safe-settings compares
+# them as exact strings.
+
+# gh-hud's hold label (it auto-merges PRs here). Without this entry a sync
+# would delete it, and with it the hold on any PR that carries it.
+labels:
+  include:
+    - name: hold
+      color: 'B60205'
+      description: "gh-hud: don't auto-merge; a person looks first"
+  exclude:
+    - name: ".*"
+
+# The required check for this repo. homebrew-tap is outside the org's code
+# repos ruleset and keeps its classic branch protection.
+#
+# "Audit" is ci.yml's job: brew readall plus the cask audit the release
+# workflows run. gh-hud auto-merges PRs here, so nothing should merge
+# before it passes. Release automation pushes formulae straight to main
+# with a repository admin's token (HOMEBREW_TAP_TOKEN), so repo admins
+# (RepositoryRole 5) bypass this ruleset, as they bypass the classic
+# protection's review rule today.
+rulesets:
+  - name: "safe-settings: homebrew-tap required checks"
+    target: branch
+    enforcement: active
+
+    conditions:
+      ref_name:
+        include:
+          - "~DEFAULT_BRANCH"
+        exclude: []
+
+    bypass_actors:
+      - actor_id: 5
+        actor_type: RepositoryRole
+        bypass_mode: always
+
+    rules:
+      - type: required_status_checks
+        parameters:
+          strict_required_status_checks_policy: false
+          required_status_checks:
+            - context: "Audit"
