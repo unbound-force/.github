@@ -1,0 +1,30 @@
+# Repo-specific overrides for containerfile.
+# Only fields that differ from the org/suborg defaults.
+
+# Required checks for this repo only. The org ruleset is shared, so a check
+# there would be required in repos that never run it. GitHub applies both
+# rulesets, so the org ruleset's approval rule still holds.
+#
+# Both are build-push.yml's per-arch builds of opencode-dev (through
+# jflowers/ship's container-image.yml), which build and smoke-test the image
+# on every PR to main. build-base.yml only runs for PRs that touch
+# Containerfile.base, so its checks can't be required.
+# gh-hud auto-merges PRs here, so nothing should merge before CI.
+rulesets:
+  - name: "safe-settings: containerfile required checks"
+    target: branch
+    enforcement: active
+
+    conditions:
+      ref_name:
+        include:
+          - "~DEFAULT_BRANCH"
+        exclude: []
+
+    rules:
+      - type: required_status_checks
+        parameters:
+          strict_required_status_checks_policy: false
+          required_status_checks:
+            - context: "opencode-dev / Build (amd64)"
+            - context: "opencode-dev / Build (arm64)"
