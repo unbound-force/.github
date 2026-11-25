@@ -63,5 +63,13 @@ labels:
 
     - name: "triaged"
       color: 'ededed'
+
+    - name: "github_actions"
+      color: '000000'
+      description: "Pull requests that update GitHub Actions code"
+
+    - name: "go"
+      color: '16e2e2'
+      description: "Pull requests that update go code"
   exclude:
     - name: ".*"
