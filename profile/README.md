@@ -34,7 +34,6 @@ prove themselves before joining the senior team.
 | [vibe-check](https://github.com/zero-dot-force/vibe-check) | Structural quality metrics for agent-written code | |
 | [reading-stone](https://github.com/zero-dot-force/reading-stone) | Test quality analysis for TypeScript | **Gaze** |
 | [snake-eyes](https://github.com/zero-dot-force/snake-eyes) | Test quality analysis for Python | **Gaze** |
-| [review-council](https://github.com/zero-dot-force/review-council) | Parallel specialist AI code review | **The Divisor** |
 
 More at [unboundforce.dev/docs/zero-dot-force](https://unboundforce.dev/docs/zero-dot-force/).
 
