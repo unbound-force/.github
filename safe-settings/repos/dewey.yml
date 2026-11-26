@@ -55,3 +55,55 @@ labels:
       color: 'ededed'
   exclude:
     - name: ".*"
+
+# Rulesets for this repo only. Repo-scoped rulesets are fully managed here:
+# a sync deletes any repo ruleset on dewey that isn't listed.
+rulesets:
+  # Required checks, moved here from the classic branch protection on main,
+  # which dewey's .github/settings.yml
+  # set through the Settings app (since edited by hand). The same check, not strict: with auto-merge
+  # (jflowers/ship's deps-automerge.yml), each merge would otherwise leave
+  # every other open PR behind, and updating one needs a fresh approval. The
+  # org ruleset still requires the code owner's approval.
+  #
+  # "CI OK" is ci.yml's aggregate job, which always reports.
+  - name: "safe-settings: dewey required checks"
+    target: branch
+    enforcement: active
+
+    conditions:
+      ref_name:
+        include:
+          - "~DEFAULT_BRANCH"
+        exclude: []
+
+    rules:
+      - type: required_status_checks
+        parameters:
+          strict_required_status_checks_policy: false
+          required_status_checks:
+            - context: "CI OK"
+
+  # Release tags are immutable: once a v* tag exists it can't be deleted or
+  # moved. Creation is allowed, so the release workflow can create the tag.
+  # Org admins may bypass to repair a bad tag. The same ruleset as dewey,
+  # gaze and replicator. Declared as it already exists
+  # (created outside safe-settings), so a sync keeps it.
+  - name: release-tag-protection
+    target: tag
+    enforcement: active
+
+    conditions:
+      ref_name:
+        include:
+          - "refs/tags/v*"
+        exclude: []
+
+    bypass_actors:
+      - actor_id: null
+        actor_type: OrganizationAdmin
+        bypass_mode: always
+
+    rules:
+      - type: deletion
+      - type: non_fast_forward

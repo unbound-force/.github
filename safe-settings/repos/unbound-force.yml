@@ -163,3 +163,27 @@ rulesets:
           required_status_checks:
             - context: "CI OK"
             - context: "Standardized CI OK"
+
+  # Release tags are immutable: once a v* tag exists it can't be deleted or
+  # moved. Creation is allowed, so the release workflow can create the tag.
+  # Org admins may bypass to repair a bad tag. The same ruleset as dewey,
+  # gaze and replicator. New: unbound-force releases v* tags without
+  # it.
+  - name: release-tag-protection
+    target: tag
+    enforcement: active
+
+    conditions:
+      ref_name:
+        include:
+          - "refs/tags/v*"
+        exclude: []
+
+    bypass_actors:
+      - actor_id: null
+        actor_type: OrganizationAdmin
+        bypass_mode: always
+
+    rules:
+      - type: deletion
+      - type: non_fast_forward
