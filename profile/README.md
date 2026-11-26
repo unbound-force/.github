@@ -23,6 +23,21 @@ into code.
 | **Dewey** | Semantic knowledge layer | [dewey](https://github.com/unbound-force/dewey) |
 | **Replicator** | Swarm orchestration | [replicator](https://github.com/unbound-force/replicator) |
 
+## The Junior Team
+
+[Zero Dot Force](https://github.com/zero-dot-force) is Unbound Force's
+incubator: new tools start there, train alongside the heroes above, and
+prove themselves before joining the senior team.
+
+| Junior | What it does | Trains with |
+|--------|--------------|-------------|
+| [vibe-check](https://github.com/zero-dot-force/vibe-check) | Structural quality metrics for agent-written code | |
+| [reading-stone](https://github.com/zero-dot-force/reading-stone) | Test quality analysis for TypeScript | **Gaze** |
+| [snake-eyes](https://github.com/zero-dot-force/snake-eyes) | Test quality analysis for Python | **Gaze** |
+| [review-council](https://github.com/zero-dot-force/review-council) | Parallel specialist AI code review | **The Divisor** |
+
+More at [unboundforce.dev/docs/zero-dot-force](https://unboundforce.dev/docs/zero-dot-force/).
+
 ## Getting Started
 
 ```bash
