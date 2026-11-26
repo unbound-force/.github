@@ -4,6 +4,17 @@
 # The repo's homepage: its page on the Unbound Force site.
 repository:
   homepage: https://unboundforce.dev/docs/projects/gaze/
+  # Subject topics; the org-wide unbound-force topic comes from
+  # settings.yml and is combined with these on sync.
+  topics:
+    - go
+    - golang
+    - static-analysis
+    - testing
+    - test-quality
+    - code-quality
+    - ai-generated-code
+    - cli
 
 # Labels in use on issues and PRs. Without these entries the org's
 # exclude rule would delete them on a sync. hold and human-gate are
