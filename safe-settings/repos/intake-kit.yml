@@ -4,6 +4,14 @@
 # The repo's homepage: its page on the Unbound Force site.
 repository:
   homepage: https://unboundforce.dev/docs/roadmap/#the-three-layer-intake-ecosystem
+  # Subject topics; the org-wide unbound-force topic comes from
+  # settings.yml and is combined with these on sync.
+  topics:
+    - cue
+    - product-requirements
+    - prd
+    - ai-code-review
+    - lola
 
 # Required checks for this repo only. The org ruleset is shared, so a check
 # there would be required in repos that never run it. GitHub applies both

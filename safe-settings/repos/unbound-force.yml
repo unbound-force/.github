@@ -8,6 +8,17 @@
 repository:
   homepage: https://unboundforce.dev/
   has_discussions: true
+  # Subject topics; the org-wide unbound-force topic comes from
+  # settings.yml and is combined with these on sync.
+  topics:
+    - go
+    - cli
+    - ai-agents
+    - multi-agent
+    - agentic-coding
+    - spec-driven-development
+    - code-review
+    - opencode
 
 labels:
   include:

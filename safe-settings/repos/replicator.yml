@@ -4,6 +4,17 @@
 # The repo's homepage: its page on the Unbound Force site.
 repository:
   homepage: https://unboundforce.dev/docs/projects/replicator/
+  # Subject topics; the org-wide unbound-force topic comes from
+  # settings.yml and is combined with these on sync.
+  topics:
+    - go
+    - mcp
+    - mcp-server
+    - multi-agent
+    - agent-orchestration
+    - ai-agents
+    - git-worktree
+    - opencode
 
 # Rulesets for this repo only. Repo-scoped rulesets are fully managed here:
 # a sync deletes any repo ruleset on replicator that isn't listed.
