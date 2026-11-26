@@ -4,6 +4,7 @@ package config
 
 import (
 	"errors"
+	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -24,6 +25,9 @@ func readSafeSettingsWorkflow(t *testing.T) string {
 func TestSafeSettingsWorkflow_PinsReviewedCommit(t *testing.T) {
 	workflow := readSafeSettingsWorkflow(t)
 
+	// 2.1.19. It has the fix for the repo-name race (safe-settings#851,
+	// fixed by #943), so the runner carries no patch for it; a pin older
+	// than 2.1.19 needs zero-dot-force's repository-copy patch back.
 	const pinnedRevision = "ref: '6a8b6ae084987025f6c5de85e3cc6df140f64502'"
 	if !strings.Contains(workflow, pinnedRevision) {
 		t.Errorf("Safe Settings workflow must contain %q", pinnedRevision)
@@ -102,56 +106,76 @@ func TestSafeSettingsWorkflow_AwaitsProbotReadinessBeforeUse(t *testing.T) {
 	}
 }
 
-func TestSafeSettingsWorkflow_PreservesExactCheckSuitePredicate(t *testing.T) {
-	workflow := readSafeSettingsWorkflow(t)
-	const predicate = `String(error).includes("Cannot read properties of undefined (reading 'check_suite')")`
-	if strings.Count(workflow, predicate) != 1 {
-		t.Errorf("Safe Settings runner must contain exactly one %q predicate", predicate)
-	}
-}
-
-func TestSafeSettingsWorkflow_CheckSuiteFailureHandling(t *testing.T) {
+func TestSafeSettingsWorkflow_FullSyncResults(t *testing.T) {
 	runner := extractFullSyncRunner(t, readSafeSettingsWorkflow(t))
 	testCases := []struct {
-		name          string
-		exception     string
-		settingsError bool
-		wantExitCode  int
-		wantOutput    string
+		name         string
+		nop          bool
+		resultError  bool
+		loggedError  bool
+		exception    string
+		wantExitCode int
+		wantOutput   []string
+		wantAbsent   []string
 	}{
 		{
-			name:         "exact check_suite exception is non-fatal",
-			exception:    "Cannot read properties of undefined (reading 'check_suite')",
-			wantExitCode: 0,
-			wantOutput:   "check_suite reporting skipped (expected in full-sync mode)",
+			name:       "clean dry run succeeds without upstream's PR comment",
+			nop:        true,
+			wantOutput: []string{"Sync results:", "Full sync completed successfully."},
+			wantAbsent: []string{"check_suite", "check run created"},
 		},
 		{
-			name:         "similar check_run exception is fatal",
-			exception:    "Cannot read properties of undefined (reading 'check_run')",
+			name:         "dry run with an ERROR result fails",
+			nop:          true,
+			resultError:  true,
 			wantExitCode: 1,
-			wantOutput:   "Unexpected error during full sync",
+			wantOutput:   []string{"::error::rulesets dewey: ruleset refused"},
 		},
 		{
-			name:         "unrelated exception is fatal",
+			name:         "dry run with a logged error fails",
+			nop:          true,
+			loggedError:  true,
+			wantExitCode: 1,
+			wantOutput:   []string{"::error::repository gaze: name already exists"},
+		},
+		{
+			name:       "clean apply creates upstream's check run",
+			wantOutput: []string{"check run created", "Full sync completed successfully."},
+		},
+		{
+			name:         "apply with a logged error fails after the check run",
+			loggedError:  true,
+			wantExitCode: 1,
+			wantOutput:   []string{"check run created", "::error::repository gaze: name already exists"},
+		},
+		{
+			name:         "unexpected exception fails",
+			nop:          true,
 			exception:    "network failure",
 			wantExitCode: 1,
-			wantOutput:   "Unexpected error during full sync",
-		},
-		{
-			name:          "settings error is fatal",
-			settingsError: true,
-			wantExitCode:  1,
+			wantOutput:   []string{"Fatal error during full sync", "network failure"},
 		},
 	}
 
 	for _, testCase := range testCases {
 		t.Run(testCase.name, func(t *testing.T) {
-			exitCode, output := runFullSyncRunner(t, runner, testCase.exception, testCase.settingsError)
+			exitCode, output := runFullSyncRunner(t, runner, map[string]bool{
+				"NOP":          testCase.nop,
+				"RESULT_ERROR": testCase.resultError,
+				"LOGGED_ERROR": testCase.loggedError,
+			}, testCase.exception)
 			if exitCode != testCase.wantExitCode {
 				t.Errorf("runner exit code = %d, want %d; output: %s", exitCode, testCase.wantExitCode, output)
 			}
-			if testCase.wantOutput != "" && !strings.Contains(output, testCase.wantOutput) {
-				t.Errorf("runner output must contain %q; got %q", testCase.wantOutput, output)
+			for _, want := range testCase.wantOutput {
+				if !strings.Contains(output, want) {
+					t.Errorf("runner output must contain %q; got %q", want, output)
+				}
+			}
+			for _, absent := range testCase.wantAbsent {
+				if strings.Contains(output, absent) {
+					t.Errorf("runner output must not contain %q; got %q", absent, output)
+				}
 			}
 		})
 	}
@@ -201,19 +225,48 @@ func extractScopedSync(t *testing.T, workflow string) string {
 	return strings.Join(lines, "\n")
 }
 
-func runFullSyncRunner(t *testing.T, runner, exception string, settingsError bool) (int, string) {
+// runFullSyncRunner runs the patched runner against a stand-in for
+// safe-settings: a Settings class whose handleResults behaves like
+// 2.1.19's (it crashes on check_suite in NOP mode, and otherwise creates
+// a check run), and a syncInstallation that records the flagged errors.
+func runFullSyncRunner(t *testing.T, runner string, flags map[string]bool, exception string) (int, string) {
 	t.Helper()
 
 	testDirectory := t.TempDir()
 	writeTestFile(t, filepath.Join(testDirectory, "full-sync-patched.js"), runner)
+	writeTestFile(t, filepath.Join(testDirectory, "lib", "settings.js"), `class Settings {
+  constructor (nop) {
+    this.nop = nop
+    this.results = []
+    this.errors = []
+    this.log = { info: (message) => process.stdout.write(message + '\n') }
+  }
+
+  async handleResults () {
+    if (this.nop) throw new TypeError("Cannot read properties of undefined (reading 'check_suite')")
+    process.stdout.write('check run created\n')
+  }
+}
+module.exports = Settings
+`)
 	writeTestFile(t, filepath.Join(testDirectory, "index.js"), `module.exports = () => ({
-  syncInstallation: async () => {
+  syncInstallation: async (nop) => {
     if (process.env.RUNNER_EXCEPTION) throw new Error(process.env.RUNNER_EXCEPTION)
-    return { errors: process.env.SETTINGS_ERROR === 'true' ? ['settings failure'] : [] }
+    const Settings = require('./lib/settings')
+    const settings = new Settings(nop)
+    if (process.env.RESULT_ERROR === 'true') {
+      settings.results.push({ type: 'ERROR', plugin: 'rulesets', repo: 'dewey', action: { msg: 'ruleset refused' } })
+    }
+    settings.results.push({ type: 'INFO', plugin: 'labels', repo: 'dewey', action: { msg: 'no change' } })
+    if (process.env.LOGGED_ERROR === 'true') {
+      settings.errors.push({ plugin: 'repository', repo: 'gaze', msg: 'name already exists' })
+    }
+    await settings.handleResults()
+    return settings
   }
 })
 `)
-	writeTestFile(t, filepath.Join(testDirectory, "lib", "env.js"), "exports.FULL_SYNC_NOP = true\n")
+	writeTestFile(t, filepath.Join(testDirectory, "lib", "env.js"), "exports.FULL_SYNC_NOP = process.env.NOP === 'true'\n")
 	writeTestFile(t, filepath.Join(testDirectory, "node_modules", "probot", "index.js"), `exports.createProbot = () => ({
   ready: async () => {},
   log: { info: (message) => process.stdout.write(message + '\n'), error: () => {} }
@@ -222,10 +275,10 @@ func runFullSyncRunner(t *testing.T, runner, exception string, settingsError boo
 
 	command := exec.Command("node", "full-sync-patched.js")
 	command.Dir = testDirectory
-	command.Env = append(os.Environ(),
-		"RUNNER_EXCEPTION="+exception,
-		"SETTINGS_ERROR="+map[bool]string{true: "true", false: "false"}[settingsError],
-	)
+	command.Env = append(os.Environ(), "RUNNER_EXCEPTION="+exception)
+	for name, value := range flags {
+		command.Env = append(command.Env, fmt.Sprintf("%s=%t", name, value))
+	}
 	output, err := command.CombinedOutput()
 	if err == nil {
 		return 0, string(output)
