@@ -1,6 +1,12 @@
 orgs:
   unbound-force:
     # Org settings
+    # The org website (unboundforce.dev) is set through the API; peribolos
+    # has no field for it.
+    name: Unbound Force
+    description: >-
+      A superhero team of AI agents that turn specs into reviewed, tested code.
+      Its junior team trains at Zero Dot Force.
     billing_email: jay.flowers@gmail.com
     default_repository_permission: read
     has_organization_projects: true
