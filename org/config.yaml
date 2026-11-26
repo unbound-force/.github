@@ -39,23 +39,23 @@ orgs:
         has_projects: true
       containerfile:
         default_branch: main
-        description: ""
+        description: "Podman image that runs OpenCode and the full Unbound Force toolchain in an isolated, rootless container."
         has_projects: true
       dewey:
         default_branch: main
-        description: "Knowledge graph MCP server for AI agents. 44 tools across Markdown vaults, semantic search, source code indexing, and persistent memory. Indexes local files, GitHub, web docs, and Go source code with local embeddings via Ollama."
+        description: "Knowledge graph MCP server for AI agents: semantic search and persistent memory over Logseq and Obsidian vaults, GitHub, web docs and code."
         has_projects: true
       eval-infra:
         default_branch: main
-        description: Shared eval tooling for opencode token efficiency and efficacy
+        description: "Eval harness that measures how efficiently and effectively OpenCode agents use tokens."
         has_projects: true
       gaze:
         default_branch: main
-        description: "Static analysis for Go that detects side effects and scores test quality -- know whether AI-generated tests actually verify behavior, not just cover lines."
+        description: "Static analysis for Go that detects side effects and scores test quality: know whether AI-generated tests actually verify behavior, not just cover lines."
         has_projects: true
       homebrew-tap:
         default_branch: main
-        description: ""
+        description: "Homebrew tap for the `uf` CLI, Gaze, Dewey and Replicator."
         has_projects: true
       intake-kit:
         default_branch: main
@@ -63,15 +63,15 @@ orgs:
         has_projects: true
       replicator:
         default_branch: main
-        description: "Go MCP server providing 53 tools for AI agent orchestration: work tracking (Org), inter-agent messaging (Comms), task decomposition with git worktree isolation (Forge), and semantic memory via Dewey. Ships an embedded agent kit (commands, skills, agents) scaffolded by replicator init. 15MB binary, <50ms startup. Installable via brew install."
+        description: "Multi-agent coordination for AI coding agents: work tracking, messaging, task decomposition in isolated git worktrees, and memory via Dewey. One Go binary."
         has_projects: true
       unbound-force:
         default_branch: main
-        description: AI agent swarm superhero team
+        description: "The `uf` CLI and hero agents of Unbound Force: a superhero team of AI agents that turns specs into reviewed, tested code."
         has_projects: true
       website:
         default_branch: main
-        description: ""
+        description: "Source for unboundforce.dev: docs, hero profiles, roadmap and blog."
         has_projects: true
 
     # Teams
