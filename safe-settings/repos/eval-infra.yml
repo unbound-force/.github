@@ -48,5 +48,8 @@ rulesets:
       - type: required_status_checks
         parameters:
           strict_required_status_checks_policy: false
+          # "CI OK" is the CI workflow's always-run aggregate: it passes when
+          # the jobs jflowers/ship's pr-scope.yml chose ran and passed, so
+          # Dewey learnings and toolkit rollout PRs skip the heavy jobs.
           required_status_checks:
-            - context: "Test"
+            - context: "CI OK"
