@@ -43,9 +43,11 @@ rulesets:
       - type: required_status_checks
         parameters:
           strict_required_status_checks_policy: false
+          # "CI OK" is the CI workflow's always-run aggregate: it passes when
+          # the jobs jflowers/ship's pr-scope.yml chose ran and passed, so
+          # Dewey learnings and toolkit rollout PRs skip the heavy jobs.
           required_status_checks:
             - context: "CI OK"
-            - context: "Standardized CI / Run linters"
 
   # Release tags are immutable: once a v* tag exists it can't be deleted or
   # moved. Creation is allowed, so the release workflow can create the tag.
